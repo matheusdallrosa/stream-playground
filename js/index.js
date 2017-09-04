@@ -10,6 +10,21 @@ var Producer = function(somethings){
   };
 };
 
+var PeriodicProducer = function(period,product){
+  var observer,intervalID;
+  return {
+    start : function(_observer){
+      this.observer = _observer;
+      intervalID = setInterval(() => {
+        this.observer.next(product);
+      },period);
+    },
+    stop : function(){
+      clearInterval(intervalID);
+    }
+  };
+};
+
 var Stream = function(producer){
   var observers = [];
   this.next = function(something){
@@ -27,12 +42,12 @@ var StreamFactory = function(){};
 StreamFactory.prototype.createStream = function(config){  
   switch (config.type){
     case "periodic":
-      this.producer = null;//this producer is not implemented yet
+      this.producer = PeriodicProducer(config.period,config.product);
       break;
     default:
-      this.producer = Producer;
+      this.producer = Producer(config.somethings);
   }
-  return new Stream(this.producer(config.somethings));
+  return new Stream(this.producer);
 };
 
 var Observer = function(){
@@ -44,5 +59,5 @@ var Observer = function(){
 };
 
 var streamFactory = new StreamFactory();
-var stream = streamFactory.createStream({somethings : [0,1,2,3,4,5,6,7,8,9]});
+var stream = streamFactory.createStream({type:"periodic",period:2000,product:"bláaaaaaaaaaaaaaa"});
 stream.addObserver(Observer());
