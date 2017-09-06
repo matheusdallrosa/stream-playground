@@ -1,12 +1,12 @@
 var Producer = function(somethings){
   var observer;
   return {
-    start : function(_observer){  
+    start : function(_observer){
       this.observer = _observer;
       for(let i = 0; i < somethings.length; i++)
-        this.observer.next(somethings[i]);      
+        this.observer.next(somethings[i]);
     },
-    stop : function(){}    
+    stop : function(){},
   };
 };
 
@@ -21,7 +21,7 @@ var PeriodicProducer = function(period,product){
     },
     stop : function(){
       clearInterval(intervalID);
-    }
+    },
   };
 };
 
@@ -37,17 +37,9 @@ var Stream = function(producer){
   }
 };
 
-var StreamFactory = function(){};
-
-StreamFactory.prototype.createStream = function(config){  
-  switch (config.type){
-    case "periodic":
-      this.producer = PeriodicProducer(config.period,config.product);
-      break;
-    default:
-      this.producer = Producer(config.somethings);
-  }
-  return new Stream(this.producer);
+var StreamFactory = {
+  from : (somethings) => new Stream(Producer(somethings)),
+  periodic : (period,product) => new Stream(PeriodicProducer(period,product)),
 };
 
 var Observer = function(){
@@ -58,6 +50,5 @@ var Observer = function(){
   };
 };
 
-var streamFactory = new StreamFactory();
-var stream = streamFactory.createStream({type:"periodic",period:2000,product:"bláaaaaaaaaaaaaaa"});
+var stream = StreamFactory.periodic(2000,"bláaaaaaaaaaaaaaa");
 stream.addObserver(Observer());
