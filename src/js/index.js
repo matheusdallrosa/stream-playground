@@ -50,15 +50,11 @@ var StreamFactory = {
   periodic : (period,product) => new Stream(PeriodicProducer(period,product)),
 };
 
-var Observer = function(){
-  return {
-    next : function(args){
-      alert(args);
-    },
-    done : function(){},
-    error : function(){},
-  };
-}
-
 var stream = StreamFactory.periodic(2000,"bláaaaaaaaaaaaaaa");
-stream.addObserver(Observer());
+stream.addObserver({
+  next : function(args){
+    console.log(args);
+  },
+  done : function(){},
+  error : function(){},
+});
