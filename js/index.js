@@ -7,6 +7,8 @@ var Producer = function(somethings){
         this.observer.next(somethings[i]);
     },
     stop : function(){},
+    done : function(){},
+    error : function(){},
   };
 }
 
@@ -22,6 +24,9 @@ var PeriodicProducer = function(period,product){
     stop : function(){
       clearInterval(intervalID);
     },
+    stop : function(){},
+    done : function(){},
+    error : function(){},
   };
 }
 
@@ -49,7 +54,9 @@ var Observer = function(){
   return {
     next : function(args){
       alert(args);
-    }
+    },
+    done : function(){},
+    error : function(){},
   };
 }
 
