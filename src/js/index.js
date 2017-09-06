@@ -24,7 +24,6 @@ var PeriodicProducer = function(period,product){
     stop : function(){
       clearInterval(intervalID);
     },
-    stop : function(){},
     done : function(){},
     error : function(){},
   };
