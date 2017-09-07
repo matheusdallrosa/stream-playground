@@ -25,10 +25,22 @@ var PeriodicProducer = function(_period,_product){
   };
 }
 
+var AbstractStream = function(){}
+
+AbstractStream.prototype.map = function(f){
+  return new Mapper(this,f);
+}
+
+AbstractStream.prototype.filter = function(f){
+  //return new Filter(this,f);
+}
+
 var Stream = function(_producer){
   this.observers = [];
   this.producer = _producer;
 }
+
+Stream.prototype.__proto__ = Object.create(AbstractStream.prototype);
 
 Stream.prototype.addObserver = function(_observer){
   this.observers.push(_observer);
@@ -48,15 +60,13 @@ Stream.prototype.stop = function(){
   this.producer.stop();
 }
 
-Stream.prototype.map = function(f){
-  return new Mapper(this,f);
-}
-
 var AbstractOperator = function(_in,_f){
   this.in = _in;
   this.f = _f;
   this.observers = [];
 }
+
+AbstractOperator.prototype.__proto__ = Object.create(AbstractStream.prototype);
 
 AbstractOperator.prototype.addObserver = function(_observer){
   this.observers.push(_observer);
@@ -82,10 +92,6 @@ Mapper.prototype.__proto__ = Object.create(AbstractOperator.prototype);
 Mapper.prototype.next = function(_something){
   for(let i = 0; i < this.observers.length; i++)
     this.observers[i].next(this.f(_something));
-}
-
-Mapper.prototype.map = function(f){
-  return new Mapper(this,f);
 }
 
 var StreamFactory = {
