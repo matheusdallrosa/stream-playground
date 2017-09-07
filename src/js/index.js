@@ -1,10 +1,10 @@
-var Producer = function(somethings){
+var Producer = function(_somethings){
   var observer;
   return {
     start : function(_observer){
       this.observer = _observer;
       for(let i = 0; i < somethings.length; i++)
-        this.observer.next(somethings[i]);
+        this.observer.next(_somethings[i]);
     },
     stop : function(){},
     done : function(){},
@@ -49,8 +49,8 @@ Stream.prototype.stop = function(){
 }
 
 var StreamFactory = {
-  from : (somethings) => new Stream(Producer(somethings)),
-  periodic : (period,product) => new Stream(PeriodicProducer(period,product)),
+  from : (_somethings) => new Stream(Producer(_somethings)),
+  periodic : (_period,_product) => new Stream(PeriodicProducer(_period,_product)),
 };
 
 var stream = StreamFactory.periodic(2000,"bláaaaaaaaaaaaaaa");
