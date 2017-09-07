@@ -52,28 +52,36 @@ Stream.prototype.map = function(f){
   return new Mapper(this,f);
 }
 
-var Mapper = function(_in,_f){
+var AbstractOperator = function(_in,_f){
   this.in = _in;
   this.f = _f;
   this.observers = [];
 }
 
-Mapper.prototype.addObserver = function(_observer){
+AbstractOperator.prototype.addObserver = function(_observer){
   this.observers.push(_observer);
   this.start();
 }
 
-Mapper.prototype.next = function(_something){
-  for(let i = 0; i < this.observers.length; i++)
-    this.observers[i].next(this.f(_something));
-}
-
-Mapper.prototype.start = function(){
+AbstractOperator.prototype.start = function(){
   if(this.observers.length === 1) this.in.addObserver(this);
 }
 
-Mapper.prototype.stop = function(){
+AbstractOperator.prototype.stop = function(){
   this.in.stop();
+}
+
+var Mapper = function(_in,_f){
+  AbstractOperator.call(this,_in,_f);
+}
+
+//i used the __proto__ property, now we don't have to assign
+//the constructor to Mapper.
+Mapper.prototype.__proto__ = Object.create(AbstractOperator.prototype);
+
+Mapper.prototype.next = function(_something){
+  for(let i = 0; i < this.observers.length; i++)
+    this.observers[i].next(this.f(_something));
 }
 
 Mapper.prototype.map = function(f){
