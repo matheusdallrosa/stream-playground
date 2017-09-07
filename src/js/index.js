@@ -12,14 +12,14 @@ var Producer = function(somethings){
   };
 }
 
-var PeriodicProducer = function(period,product){
+var PeriodicProducer = function(_period,_product){
   var observer,intervalID;
   return {
     start : function(_observer){
       this.observer = _observer;
       intervalID = setInterval(() => {
-        this.observer.next(product);
-      },period);
+        this.observer.next(_product);
+      },_period);
     },
     stop : function(){
       clearInterval(intervalID);
@@ -29,19 +29,19 @@ var PeriodicProducer = function(period,product){
   };
 }
 
-var Stream = function(producer){
+var Stream = function(_producer){
   this.observers = [];
-  this.producer = producer;
+  this.producer = _producer;
 }
 
-Stream.prototype.addObserver = function(observer){
-    this.observers.push(observer);
+Stream.prototype.addObserver = function(_observer){
+    this.observers.push(_observer);
     if(this.observers.length === 1) this.producer.start(this);
 }
 
-Stream.prototype.next = function(something){
+Stream.prototype.next = function(_something){
   for(let i = 0; i < this.observers.length; i++)
-    this.observers[i].next(something);
+    this.observers[i].next(_something);
 }
 
 Stream.prototype.stop = function(){
@@ -55,16 +55,16 @@ var StreamFactory = {
 
 var stream = StreamFactory.periodic(2000,"bláaaaaaaaaaaaaaa");
 stream.addObserver({
-  next : function(args){
-    console.log("ob1: " + args);
+  next : function(_args){
+    console.log("ob1: " + _args);
   },
   done : function(){},
   error : function(){},
 });
 
 stream.addObserver({
-  next : function(args){
-    console.log("ob2: " + args);
+  next : function(_args){
+    console.log("ob2: " + _args);
   },
   done : function(){},
   error : function(){},
