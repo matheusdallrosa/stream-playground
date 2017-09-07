@@ -3,7 +3,7 @@ var Producer = function(_somethings){
   return {
     start : function(_observer){
       this.observer = _observer;
-      for(let i = 0; i < somethings.length; i++)
+      for(let i = 0; i < _somethings.length; i++)
         this.observer.next(_somethings[i]);
     },
     stop : function(){},
@@ -32,7 +32,7 @@ AbstractStream.prototype.map = function(f){
 }
 
 AbstractStream.prototype.filter = function(f){
-  //return new Filter(this,f);
+  return new Filter(this,f);
 }
 
 var Stream = function(_producer){
@@ -98,6 +98,18 @@ Mapper.prototype.next = function(_something){
   this._next(this.f(_something));
 }
 
+var Filter = function(_in,_f){
+  AbstractOperator.call(this,_in,_f);
+}
+
+Filter.prototype.__proto__ = Object.create(AbstractOperator.prototype);
+
+Filter.prototype.next = function(_something){
+  if(this.f(_something)){
+    this._next(_something);
+  }
+}
+
 var StreamFactory = {
   from : (_somethings) => new Stream(Producer(_somethings)),
   periodic : (_period,_product) => new Stream(PeriodicProducer(_period,_product)),
@@ -130,3 +142,10 @@ var mappedStream1 = mappedSream0.map(x => x + " map1");
 mappedStream1.addObserver({
   next : data => console.log(data)
 });
+
+var stream1 = StreamFactory.from([1,2,3,4,5,6,7,8,9,10]);
+
+stream1
+  .filter(x => (x % 2) === 0)
+  .map(x => x*2)
+  .addObserver({next : y => console.log(y)});
