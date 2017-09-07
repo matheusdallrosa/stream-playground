@@ -7,8 +7,6 @@ var Producer = function(_somethings){
         this.observer.next(_somethings[i]);
     },
     stop : function(){},
-    done : function(){},
-    error : function(){},
   };
 }
 
@@ -24,8 +22,6 @@ var PeriodicProducer = function(_period,_product){
     stop : function(){
       clearInterval(intervalID);
     },
-    done : function(){},
-    error : function(){},
   };
 }
 
@@ -35,8 +31,8 @@ var Stream = function(_producer){
 }
 
 Stream.prototype.addObserver = function(_observer){
-    this.observers.push(_observer);
-    if(this.observers.length === 1) this.producer.start(this);
+  this.observers.push(_observer);
+  if(this.observers.length === 1) this.producer.start(this);
 }
 
 Stream.prototype.next = function(_something){
