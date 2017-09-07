@@ -73,6 +73,11 @@ AbstractOperator.prototype.addObserver = function(_observer){
   this.start();
 }
 
+AbstractOperator.prototype._next = function(_something){
+  for(let i = 0; i < this.observers.length; i++)
+    this.observers[i].next(_something);
+}
+
 AbstractOperator.prototype.start = function(){
   if(this.observers.length === 1) this.in.addObserver(this);
 }
@@ -90,8 +95,7 @@ var Mapper = function(_in,_f){
 Mapper.prototype.__proto__ = Object.create(AbstractOperator.prototype);
 
 Mapper.prototype.next = function(_something){
-  for(let i = 0; i < this.observers.length; i++)
-    this.observers[i].next(this.f(_something));
+  this._next(this.f(_something));
 }
 
 var StreamFactory = {
