@@ -32,7 +32,7 @@ var Stream = function(_producer){
 
 Stream.prototype.addObserver = function(_observer){
   this.observers.push(_observer);
-  if(this.observers.length === 1) this.producer.start(this);
+  this.start();
 }
 
 Stream.prototype.next = function(_something){
@@ -40,8 +40,44 @@ Stream.prototype.next = function(_something){
     this.observers[i].next(_something);
 }
 
+Stream.prototype.start = function(){
+  if(this.observers.length === 1) this.producer.start(this);
+};
+
 Stream.prototype.stop = function(){
   this.producer.stop();
+}
+
+Stream.prototype.map = function(f){
+  return new Mapper(this,f);
+}
+
+var Mapper = function(_in,_f){
+  this.in = _in;
+  this.f = _f;
+  this.observers = [];
+}
+
+Mapper.prototype.addObserver = function(_observer){
+  this.observers.push(_observer);
+  this.start();
+}
+
+Mapper.prototype.next = function(_something){
+  for(let i = 0; i < this.observers.length; i++)
+    this.observers[i].next(this.f(_something));
+}
+
+Mapper.prototype.start = function(){
+  if(this.observers.length === 1) this.in.addObserver(this);
+}
+
+Mapper.prototype.stop = function(){
+  this.in.stop();
+}
+
+Mapper.prototype.map = function(f){
+  return new Mapper(this,f);
 }
 
 var StreamFactory = {
@@ -64,4 +100,15 @@ stream.addObserver({
   },
   done : function(){},
   error : function(){},
+});
+
+var mappedSream0 = stream.map(x => x + " map0");
+
+mappedSream0.addObserver({
+  next : data => console.log(data)
+});
+
+var mappedStream1 = mappedSream0.map(x => x + " map1");
+mappedStream1.addObserver({
+  next : data => console.log(data)
 });
