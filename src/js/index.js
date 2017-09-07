@@ -36,12 +36,16 @@ var Stream = function(producer){
 
 Stream.prototype.addObserver = function(observer){
     this.observers.push(observer);
-    this.producer.start(this);
+    if(this.observers.length === 1) this.producer.start(this);
 }
 
 Stream.prototype.next = function(something){
   for(let i = 0; i < this.observers.length; i++)
     this.observers[i].next(something);
+}
+
+Stream.prototype.stop = function(){
+  this.producer.stop();
 }
 
 var StreamFactory = {
@@ -52,7 +56,15 @@ var StreamFactory = {
 var stream = StreamFactory.periodic(2000,"bláaaaaaaaaaaaaaa");
 stream.addObserver({
   next : function(args){
-    console.log(args);
+    console.log("ob1: " + args);
+  },
+  done : function(){},
+  error : function(){},
+});
+
+stream.addObserver({
+  next : function(args){
+    console.log("ob2: " + args);
   },
   done : function(){},
   error : function(){},
