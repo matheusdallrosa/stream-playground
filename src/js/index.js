@@ -82,8 +82,6 @@ var Mapper = function(_in,_f){
   AbstractOperator.call(this,_in,_f);
 }
 
-//i used the __proto__ property, now we don't have to assign
-//the constructor to Mapper.
 Mapper.prototype = Object.create(AbstractOperator.prototype);
 Mapper.constructor = Mapper;
 
