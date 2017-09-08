@@ -27,6 +27,16 @@ var PeriodicProducer = function(_period,_product){
 
 var AbstractStream = function(){}
 
+AbstractStream.prototype.addObserver = function(_observer){
+  this.observers.push(_observer);
+  this.start();
+}
+
+AbstractStream.prototype.next = function(_something){
+  for(let i = 0; i < this.observers.length; i++)
+    this.observers[i].next(_something);
+}
+
 AbstractStream.prototype.map = function(f){
   return new Mapper(this,f);
 }
@@ -41,16 +51,6 @@ var Stream = function(_producer){
 }
 
 Stream.prototype.__proto__ = Object.create(AbstractStream.prototype);
-
-Stream.prototype.addObserver = function(_observer){
-  this.observers.push(_observer);
-  this.start();
-}
-
-Stream.prototype.next = function(_something){
-  for(let i = 0; i < this.observers.length; i++)
-    this.observers[i].next(_something);
-}
 
 Stream.prototype.start = function(){
   if(this.observers.length === 1) this.producer.start(this);
@@ -67,16 +67,6 @@ var AbstractOperator = function(_in,_f){
 }
 
 AbstractOperator.prototype.__proto__ = Object.create(AbstractStream.prototype);
-
-AbstractOperator.prototype.addObserver = function(_observer){
-  this.observers.push(_observer);
-  this.start();
-}
-
-AbstractOperator.prototype._next = function(_something){
-  for(let i = 0; i < this.observers.length; i++)
-    this.observers[i].next(_something);
-}
 
 AbstractOperator.prototype.start = function(){
   if(this.observers.length === 1) this.in.addObserver(this);
@@ -95,7 +85,7 @@ var Mapper = function(_in,_f){
 Mapper.prototype.__proto__ = Object.create(AbstractOperator.prototype);
 
 Mapper.prototype.next = function(_something){
-  this._next(this.f(_something));
+  AbstractStream.prototype.next.call(this,this.f(_something));
 }
 
 var Filter = function(_in,_f){
@@ -106,7 +96,7 @@ Filter.prototype.__proto__ = Object.create(AbstractOperator.prototype);
 
 Filter.prototype.next = function(_something){
   if(this.f(_something)){
-    this._next(_something);
+    AbstractStream.prototype.next.call(this,_something);
   }
 }
 
