@@ -50,7 +50,8 @@ var Stream = function(_producer){
   this.producer = _producer;
 }
 
-Stream.prototype.__proto__ = Object.create(AbstractStream.prototype);
+Stream.prototype = Object.create(AbstractStream.prototype);
+Stream.constructor = Stream;
 
 Stream.prototype.start = function(){
   if(this.observers.length === 1) this.producer.start(this);
@@ -66,7 +67,8 @@ var AbstractOperator = function(_in,_f){
   this.observers = [];
 }
 
-AbstractOperator.prototype.__proto__ = Object.create(AbstractStream.prototype);
+AbstractOperator.prototype = Object.create(AbstractStream.prototype);
+AbstractOperator.constructor = AbstractOperator;
 
 AbstractOperator.prototype.start = function(){
   if(this.observers.length === 1) this.in.addObserver(this);
@@ -82,7 +84,8 @@ var Mapper = function(_in,_f){
 
 //i used the __proto__ property, now we don't have to assign
 //the constructor to Mapper.
-Mapper.prototype.__proto__ = Object.create(AbstractOperator.prototype);
+Mapper.prototype = Object.create(AbstractOperator.prototype);
+Mapper.constructor = Mapper;
 
 Mapper.prototype.next = function(_something){
   AbstractStream.prototype.next.call(this,this.f(_something));
@@ -92,7 +95,8 @@ var Filter = function(_in,_f){
   AbstractOperator.call(this,_in,_f);
 }
 
-Filter.prototype.__proto__ = Object.create(AbstractOperator.prototype);
+Filter.prototype = Object.create(AbstractOperator.prototype);
+Filter.constructor = Filter;
 
 Filter.prototype.next = function(_something){
   if(this.f(_something)){
