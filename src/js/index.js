@@ -27,6 +27,7 @@ var PeriodicProducer = function(_period,_product){
 
 var AbstractStream = function(){}
 
+//who inherits the AbstractStream must implement this.start()
 AbstractStream.prototype.addObserver = function(_observer){
   this.observers.push(_observer);
   this.start();
@@ -43,6 +44,10 @@ AbstractStream.prototype.map = function(f){
 
 AbstractStream.prototype.filter = function(f){
   return new Filter(this,f);
+}
+
+AbstractStream.prototype.delay = function(time){
+  return new Delay(this,time);
 }
 
 var Stream = function(_producer){
@@ -102,6 +107,19 @@ Filter.prototype.next = function(_something){
   }
 }
 
+var Delay = function(_in,_f){
+  AbstractOperator.call(this,_in,_f);
+}
+
+Delay.prototype = Object.create(AbstractOperator.prototype);
+Delay.constructor = Delay;
+
+Delay.prototype.next = function(_something){
+  setTimeout(() => {
+    AbstractStream.prototype.next.call(this,_something);
+  },this.f);
+}
+
 var StreamFactory = {
   from : (_somethings) => new Stream(Producer(_somethings)),
   periodic : (_period,_product) => new Stream(PeriodicProducer(_period,_product)),
@@ -140,4 +158,5 @@ var stream1 = StreamFactory.from([1,2,3,4,5,6,7,8,9,10]);
 stream1
   .filter(x => (x % 2) === 0)
   .map(x => x*2)
+  .delay(1000)
   .addObserver({next : y => console.log(y)});
